@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Shiabit
+Comment=Shiabit P2P Cryptocurrency
+Comment[fr]=Shiabit, monnaie virtuelle cryptographique pair à pair
+Comment[tr]=Shiabit, eşten eşe kriptografik sanal para birimi
+Exec=shiabit-qt %u
+Terminal=false
+Type=Application
+Icon=shiabit128
+MimeType=x-scheme-handler/shiabit;
+Categories=Office;Finance;

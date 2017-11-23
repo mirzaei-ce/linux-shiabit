@@ -1,0 +1,5 @@
+Building Shiabit
+
+See doc/build-*.md for instructions on building shiabitd,
+the intended-for-services, no-graphical-interface, reference
+implementation of Shiabit.

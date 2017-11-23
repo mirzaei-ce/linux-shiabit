@@ -1,0 +1,92 @@
+#!/sbin/runscript
+
+# backward compatibility for existing gentoo layout 
+#
+if [ -d "/var/lib/shiabit/.shiabit" ]; then
+	SHIABITD_DEFAULT_DATADIR="/var/lib/shiabit/.shiabit"
+else
+	SHIABITD_DEFAULT_DATADIR="/var/lib/shiabitd"
+fi
+
+SHIABITD_CONFIGFILE=${SHIABITD_CONFIGFILE:-/etc/shiabit/shiabit.conf}
+SHIABITD_PIDDIR=${SHIABITD_PIDDIR:-/var/run/shiabitd}
+SHIABITD_PIDFILE=${SHIABITD_PIDFILE:-${SHIABITD_PIDDIR}/shiabitd.pid}
+SHIABITD_DATADIR=${SHIABITD_DATADIR:-${SHIABITD_DEFAULT_DATADIR}}
+SHIABITD_USER=${SHIABITD_USER:-${SHIABIT_USER:-shiabit}}
+SHIABITD_GROUP=${SHIABITD_GROUP:-shiabit}
+SHIABITD_BIN=${SHIABITD_BIN:-/usr/bin/shiabitd}
+SHIABITD_NICE=${SHIABITD_NICE:-${NICELEVEL:-0}}
+SHIABITD_OPTS="${SHIABITD_OPTS:-${SHIABIT_OPTS}}"
+
+name="Shiabit Core Daemon"
+description="Shiabit cryptocurrency P2P network daemon"
+
+command="/usr/bin/shiabitd"
+command_args="-pid=\"${SHIABITD_PIDFILE}\" \
+		-conf=\"${SHIABITD_CONFIGFILE}\" \
+		-datadir=\"${SHIABITD_DATADIR}\" \
+		-daemon \
+		${SHIABITD_OPTS}"
+
+required_files="${SHIABITD_CONFIGFILE}"
+start_stop_daemon_args="-u ${SHIABITD_USER} \
+			-N ${SHIABITD_NICE} -w 2000"
+pidfile="${SHIABITD_PIDFILE}"
+
+# The retry schedule to use when stopping the daemon. Could be either
+# a timeout in seconds or multiple signal/timeout pairs (like
+# "SIGKILL/180 SIGTERM/300")
+retry="${SHIABITD_SIGTERM_TIMEOUT}"
+
+depend() {
+	need localmount net
+}
+
+# verify
+# 1) that the datadir exists and is writable (or create it)
+# 2) that a directory for the pid exists and is writable
+# 3) ownership and permissions on the config file
+start_pre() {
+	checkpath \
+	-d \
+	--mode 0750 \
+	--owner "${SHIABITD_USER}:${SHIABITD_GROUP}" \
+	"${SHIABITD_DATADIR}"
+
+	checkpath \
+	-d \
+	--mode 0755 \
+	--owner "${SHIABITD_USER}:${SHIABITD_GROUP}" \
+	"${SHIABITD_PIDDIR}"
+
+	checkpath -f \
+	-o ${SHIABITD_USER}:${SHIABITD_GROUP} \
+	-m 0660 \
+	${SHIABITD_CONFIGFILE}
+
+	checkconfig || return 1
+}
+
+checkconfig()
+{
+	if ! grep -qs '^rpcpassword=' "${SHIABITD_CONFIGFILE}" ; then
+		eerror ""
+		eerror "ERROR: You must set a secure rpcpassword to run shiabitd."
+		eerror "The setting must appear in ${SHIABITD_CONFIGFILE}"
+		eerror ""
+		eerror "This password is security critical to securing wallets "
+		eerror "and must not be the same as the rpcuser setting."
+		eerror "You can generate a suitable random password using the following"
+		eerror "command from the shell:"
+		eerror ""
+		eerror "bash -c 'tr -dc a-zA-Z0-9 < /dev/urandom | head -c32 && echo'"
+		eerror ""
+		eerror "It is also recommended that you also set alertnotify so you are "
+		eerror "notified of problems:"
+		eerror ""
+		eerror "ie: alertnotify=echo %%s | mail -s \"Shiabit Alert\"" \
+			"admin@foo.com"
+		eerror ""
+		return 1
+	fi
+}

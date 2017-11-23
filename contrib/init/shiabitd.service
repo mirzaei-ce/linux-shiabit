@@ -1,0 +1,22 @@
+[Unit]
+Description=Shiabit's distributed currency daemon
+After=network.target
+
+[Service]
+User=shiabit
+Group=shiabit
+
+Type=forking
+PIDFile=/var/lib/shiabitd/shiabitd.pid
+ExecStart=/usr/bin/shiabitd -daemon -pid=/var/lib/shiabitd/shiabitd.pid \
+-conf=/etc/shiabit/shiabit.conf -datadir=/var/lib/shiabitd -disablewallet
+
+Restart=always
+PrivateTmp=true
+TimeoutStopSec=60s
+TimeoutStartSec=2s
+StartLimitInterval=120s
+StartLimitBurst=5
+
+[Install]
+WantedBy=multi-user.target

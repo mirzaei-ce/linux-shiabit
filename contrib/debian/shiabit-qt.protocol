@@ -1,0 +1,11 @@
+[Protocol]
+exec=shiabit-qt '%u'
+protocol=shiabit
+input=none
+output=none
+helper=true
+listing=
+reading=false
+writing=false
+makedir=false
+deleting=false

@@ -1,0 +1,33 @@
+# /etc/conf.d/shiabitd: config file for /etc/init.d/shiabitd
+
+# Config file location
+#SHIABITD_CONFIGFILE="/etc/shiabit/shiabit.conf"
+
+# What directory to write pidfile to?  (created and owned by $SHIABITD_USER)
+#SHIABITD_PIDDIR="/var/run/shiabitd"
+
+# What filename to give the pidfile
+#SHIABITD_PIDFILE="${SHIABITD_PIDDIR}/shiabitd.pid"
+
+# Where to write shiabitd data (be mindful that the blockchain is large)
+#SHIABITD_DATADIR="/var/lib/shiabitd"
+
+# User and group to own shiabitd process
+#SHIABITD_USER="shiabit"
+#SHIABITD_GROUP="shiabit"
+
+# Path to shiabitd executable
+#SHIABITD_BIN="/usr/bin/shiabitd"
+
+# Nice value to run shiabitd under
+#SHIABITD_NICE=0
+
+# Additional options (avoid -conf and -datadir, use flags above)
+SHIABITD_OPTS="-disablewallet"
+
+# The timeout in seconds OpenRC will wait for shiabitd to terminate
+# after a SIGTERM has been raised.
+# Note that this will be mapped as argument to start-stop-daemon's
+# '--retry' option, which means you can specify a retry schedule
+# here. For more information see man 8 start-stop-daemon.
+SHIABITD_SIGTERM_TIMEOUT=60
